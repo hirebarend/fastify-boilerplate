@@ -84,7 +84,7 @@ export class ConsumerRepository {
 
     if (!this.publicKeys || !this.publicKeys[tokenDecoded.header.kid || '']) {
       const response = await axios.get<{ [key: string]: string }>(
-        'https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com',
+        'https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com', // TODO
       );
 
       this.publicKeys = response.data;
@@ -94,6 +94,10 @@ export class ConsumerRepository {
       const result: jsonwebtoken.JwtPayload = jsonwebtoken.verify(
         token,
         this.publicKeys[tokenDecoded.header.kid || ''],
+        {
+          audience: process.env.JWT_AUDIENCE,
+          issuer: process.env.JWT_ISSUER,
+        },
       ) as jsonwebtoken.JwtPayload;
 
       if (!result.sub) {

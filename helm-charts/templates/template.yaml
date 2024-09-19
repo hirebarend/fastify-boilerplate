@@ -3,6 +3,8 @@ kind: Secret
 metadata:
   name: {{ .Release.Name }}-secret
 data:
+  JWT_AUDIENCE: {{ .Values.JWT_AUDIENCE | b64enc }}
+  JWT_ISSUER: {{ .Values.JWT_ISSUER | b64enc }}
   MONGODB_CONNECTION_STRING: {{ .Values.MONGODB_CONNECTION_STRING | b64enc }}
 ---
 apiVersion: batch/v1

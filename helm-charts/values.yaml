@@ -1,3 +1,5 @@
 HOST: "<HOST>" # Replace with your host
+JWT_AUDIENCE: '<JWT_AUDIENCE>'
+JWT_ISSUER: '<JWT_ISSUER>'
 MONGODB_CONNECTION_STRING: "<MONGODB_CONNECTION_STRING>" # Replace with your MongoDB connection string
 USERNAME: "<USERNAME>" # Replace with your GitHub username
