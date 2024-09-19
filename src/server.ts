@@ -27,14 +27,7 @@ export async function startServer() {
   });
 
   await server.addContentTypeParser(
-    [
-      // TODO:
-      'application/octet-stream',
-      'application/pdf',
-      'image/jpg',
-      'image/jpeg',
-      'image/png',
-    ],
+    '*',
     { parseAs: 'buffer' },
     (
       request: any,
@@ -45,12 +38,15 @@ export async function startServer() {
     },
   );
 
-  if (process.env.MONGODB_CONNECTION_STRING) {
+  if (
+    process.env.MONGODB_CONNECTION_STRING &&
+    process.env.MONGODB_DATABASE_NAME
+  ) {
     server.addHook(
       'onResponse',
       await Logger(
         process.env.MONGODB_CONNECTION_STRING as string,
-        'get-verified', // TODO
+        process.env.MONGODB_DATABASE_NAME as string,
         'logs',
       ),
     );

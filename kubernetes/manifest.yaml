@@ -3,7 +3,10 @@ kind: Secret
 metadata:
   name: fastify-boilerplate-secret
 data:
+  JWT_AUDIENCE: "<PLACEHOLDER>"
+  JWT_ISSUER: "<PLACEHOLDER>"
   MONGODB_CONNECTION_STRING: "<PLACEHOLDER>"
+  MONGODB_DATABASE_NAME: "<PLACEHOLDER>"
 ---
 apiVersion: batch/v1
 kind: Job
@@ -14,7 +17,7 @@ spec:
     spec:
       containers:
       - name: fastify-boilerplate
-        image: ghcr.io/<USERNAME>/fastify-boilerplate:main # TODO
+        image: ghcr.io/<USERNAME>/fastify-boilerplate:main
         imagePullPolicy: Always
         resources:
           requests:

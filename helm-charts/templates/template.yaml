@@ -6,6 +6,7 @@ data:
   JWT_AUDIENCE: {{ .Values.JWT_AUDIENCE | b64enc }}
   JWT_ISSUER: {{ .Values.JWT_ISSUER | b64enc }}
   MONGODB_CONNECTION_STRING: {{ .Values.MONGODB_CONNECTION_STRING | b64enc }}
+  MONGODB_DATABASE_NAME: {{ .Values.MONGODB_DATABASE_NAME | b64enc }}
 ---
 apiVersion: batch/v1
 kind: Job
