@@ -31,6 +31,11 @@ npm run dev
     * `job.ts`: contains the `job()` function which will be executed once and only restarted upon failure, it's intended purpose is the run backgrounds tasks and/or listen to queues
     * `main.ts`: primary entry point
     * `server.ts`: contains the `startServer()` function which configures and starts the Fastify server
+* `Dockerfile`
+
+## Supported Cloud Providers
+
+* [Digital Ocean](https://www.digitalocean.com/products/kubernetes)
 
 ## Deploy to Kubernetes
 

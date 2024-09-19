@@ -34,7 +34,7 @@ kind: Deployment
 metadata:
   name: {{ .Release.Name }}-deployment
 spec:
-  replicas: 1
+  replicas: 2
   revisionHistoryLimit: 0
   strategy:
     type: RollingUpdate
@@ -66,6 +66,9 @@ spec:
             port: 8080
           initialDelaySeconds: 5
           periodSeconds: 10
+        env:
+        - name: HOST
+          value: "{{ .Values.HOST }}"
         envFrom:
         - secretRef:
             name: {{ .Release.Name }}-secret

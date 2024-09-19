@@ -1,10 +1,13 @@
-import { RouteOptions } from 'fastify';
+import { FastifyReply, FastifyRequest, RouteOptions } from 'fastify';
 import { faker } from '@faker-js/faker';
 import { Collection } from 'mongodb';
 import { Consumer, getContainer, Person } from '../core';
 
-export const PEOPLE_POST: RouteOptions = {
-  handler: async (request, reply) => {
+export const PEOPLE_POST: RouteOptions<any, any, any, any> = {
+  handler: async (
+    request: FastifyRequest<{ Body: { firstName: string; lastName: string } }>,
+    reply: FastifyReply,
+  ) => {
     const container = await getContainer();
 
     const consumer: Consumer | null =
@@ -12,27 +15,23 @@ export const PEOPLE_POST: RouteOptions = {
         request.headers['authorization'],
       );
 
-    if (!consumer) {
-      reply.status(401).send();
+    // Uncomment the following lines to enforce authentication
+    // if (!consumer) {
+    //   reply.status(401).send();
 
-      return;
-    }
+    //   return;
+    // }
 
     const collection: Collection<Person> =
       container.db.collection<Person>('people');
 
-    const body: {
-      firstName: string;
-      lastName: string;
-    } = request.body as any;
-
     const person: Person = {
-      firstName: body.firstName,
+      firstName: request.body.firstName,
       id: faker.string.alphanumeric({
         casing: 'lower',
         length: 8,
       }),
-      lastName: body.lastName,
+      lastName: request.body.lastName,
     };
 
     await collection.insertOne({
@@ -44,6 +43,13 @@ export const PEOPLE_POST: RouteOptions = {
   method: 'POST',
   url: '/api/v1/people',
   schema: {
+    tags: ['people'],
+    // Uncomment the following lines to enforce authentication
+    // security: [
+    //   {
+    //     apiKey: [],
+    //   },
+    // ],
     body: {
       type: 'object',
       properties: {

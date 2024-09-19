@@ -45,14 +45,16 @@ export async function startServer() {
     },
   );
 
-  server.addHook(
-    'onResponse',
-    await Logger(
-      process.env.MONGODB_CONNECTION_STRING as string,
-      'get-verified', // TODO
-      'logs',
-    ),
-  );
+  if (process.env.MONGODB_CONNECTION_STRING) {
+    server.addHook(
+      'onResponse',
+      await Logger(
+        process.env.MONGODB_CONNECTION_STRING as string,
+        'get-verified', // TODO
+        'logs',
+      ),
+    );
+  }
 
   await server.register(fastifySwagger, {
     swagger: {
@@ -64,13 +66,17 @@ export async function startServer() {
         version: '0.1.0',
       },
       produces: ['application/json'],
-      schemes: process.env.DEBUG ? ['http'] : ['https', 'http'],
+      schemes: process.env.HOST ? ['https', 'http'] : ['http'],
       securityDefinitions: {
         apiKey: {
           type: 'apiKey',
           name: 'Authorization',
           in: 'header',
         },
+      },
+      externalDocs: {
+        url: 'https://github.com/hirebarend/fastify-boilerplate',
+        description: 'View Offical Documentation',
       },
     },
   });
