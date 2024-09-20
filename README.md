@@ -1,8 +1,13 @@
 # Fastify Boilerplate
 
+``` code
+Hey There! 🙌 
+🤾 that ⭐️ button if you like this boilerplate. 
+```
+
 The Fastify boilerplate with all you need to build your SaaS, AI tool, or any other web app and make your first $ online fast.
 
-## Get Started
+## 🚀 Getting Started
 
 ```bash
 git clone https://github.com/<USERNAME>/fastify-boilerplate.git
@@ -16,16 +21,16 @@ npm run dev
 # go to http://localhost:8080
 ```
 
-## Project Structure
+## 🛠️ Project Structure
 
 * `.github`
     * `workflows`
-        * `main.yaml`: ...
+        * `main.yaml`
 * `helm-charts`: Helm Chart
 * `kubernetes`: Kubernetes manifest files
 * `src`
     * `core`: contains the models, IOC container and application logic
-        * `beetle`: ...
+        * `beetle`
     * `hooks`: contains the custom hooks for Fastify such as the logger hook
     * `routes`: contains the routes for Fastify
     * `job.ts`: contains the `job()` function which will be executed once and only restarted upon failure, it's intended purpose is the run backgrounds tasks and/or listen to queues
@@ -45,7 +50,7 @@ npm run dev
 helm install my-fastify-boilerplate ./helm-charts
 ```
 
-## Contributing
+## 🤝 Contributing
 
 We love our contributors! Here's how you can contribute:
 
