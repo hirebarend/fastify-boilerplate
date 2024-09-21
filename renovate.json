@@ -6,5 +6,5 @@
   "rangeStrategy": "bump",
   "automerge": true,
   "automergeType": "branch",
-  "automergeStrategy": "branch-push"
+  "automergeStrategy": "auto"
 }
