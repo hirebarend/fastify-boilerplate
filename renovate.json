@@ -1,10 +1,10 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended"
-  ],
-  "rangeStrategy": "bump",
+  "extends": ["config:base"],
   "automerge": true,
-  "automergeType": "branch",
-  "automergeStrategy": "auto"
+  "automergeType": "pr",
+  "platformAutomerge": true,
+  "rangeStrategy": "bump",
+  "requiredStatusChecks": null,
+  "updateNotScheduled": false
 }
