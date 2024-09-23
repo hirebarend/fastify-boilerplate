@@ -3,10 +3,9 @@ kind: Secret
 metadata:
   name: {{ .Release.Name }}-secret
 data:
-  JWT_AUDIENCE: {{ .Values.JWT_AUDIENCE | b64enc }}
-  JWT_ISSUER: {{ .Values.JWT_ISSUER | b64enc }}
-  MONGODB_CONNECTION_STRING: {{ .Values.MONGODB_CONNECTION_STRING | b64enc }}
-  MONGODB_DATABASE_NAME: {{ .Values.MONGODB_DATABASE_NAME | b64enc }}
+{{- range $key, $value := .Values }}
+  {{ $key }}: {{ $value | b64enc | quote  }}
+{{- end }}
 ---
 apiVersion: batch/v1
 kind: Job
@@ -51,6 +50,8 @@ spec:
     metadata:
       labels:
         app: {{ .Release.Name }}
+      annotations:
+        deployment-timestamp: "{{ now }}"
     spec:
       containers:
       - name: {{ .Release.Name }}
@@ -69,9 +70,6 @@ spec:
             port: 8080
           initialDelaySeconds: 5
           periodSeconds: 10
-        env:
-        - name: HOST
-          value: "{{ .Values.HOST }}"
         envFrom:
         - secretRef:
             name: {{ .Release.Name }}-secret
