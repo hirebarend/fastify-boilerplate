@@ -1,11 +1,8 @@
 import { Db, MongoClient } from 'mongodb';
-import { ConsumerRepository, TokenRepository } from './beetle';
 
 export type Container = {
-  consumerRepository: ConsumerRepository;
   db: Db;
   mongoClient: MongoClient;
-  tokenRepository: TokenRepository;
 };
 
 let container: Container | null = null;
@@ -21,13 +18,9 @@ export async function getContainer() {
 
   const db = mongoClient.db(process.env.MONGODB_DATABASE_NAME as string);
 
-  const tokenRepository: TokenRepository = new TokenRepository(db);
-
   container = {
-    consumerRepository: new ConsumerRepository(db, tokenRepository),
     db,
     mongoClient,
-    tokenRepository,
   };
 
   return container;

@@ -1,6 +1,6 @@
 import cluster from 'cluster';
 require('dotenv').config();
-import os from 'os';
+import * as os from 'os';
 import { startServer } from './server';
 import { job } from './job';
 

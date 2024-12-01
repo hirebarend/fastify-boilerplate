@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest, RouteOptions } from 'fastify';
 import { faker } from '@faker-js/faker';
 import { Collection } from 'mongodb';
-import { Consumer, getContainer, Person } from '../core';
+import { getContainer, Person } from '../core';
 
 export const PEOPLE_POST: RouteOptions<any, any, any, any> = {
   handler: async (
@@ -9,18 +9,6 @@ export const PEOPLE_POST: RouteOptions<any, any, any, any> = {
     reply: FastifyReply,
   ) => {
     const container = await getContainer();
-
-    const consumer: Consumer | null =
-      await container.consumerRepository.fromHeader(
-        request.headers['authorization'],
-      );
-
-    // Uncomment the following lines to enforce authentication
-    // if (!consumer) {
-    //   reply.status(401).send();
-
-    //   return;
-    // }
 
     const collection: Collection<Person> =
       container.db.collection<Person>('people');

@@ -27,10 +27,8 @@ npm run dev
     * `workflows`
         * `main.yaml`
 * `helm-charts`: Helm Chart
-* `kubernetes`: Kubernetes manifest files
 * `src`
     * `core`: contains the models, IOC container and application logic
-        * `beetle`
     * `hooks`: contains the custom hooks for Fastify such as the logger hook
     * `routes`: contains the routes for Fastify
     * `job.ts`: contains the `job()` function which will be executed once and only restarted upon failure, it's intended purpose is the run backgrounds tasks and/or listen to queues

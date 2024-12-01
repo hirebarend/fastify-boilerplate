@@ -2,12 +2,7 @@ import fastify from 'fastify';
 import fastifyCors from '@fastify/cors';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
-import qs from 'qs';
-import {
-  BEETLE_CONSUMERS_GET,
-  BEETLE_TOKENS_GET,
-  BEETLE_TOKENS_POST,
-} from './core';
+import * as qs from 'qs';
 import { PEOPLE_POST } from './routes';
 import { Logger } from './hooks';
 
@@ -80,12 +75,6 @@ export async function startServer() {
   await server.register(fastifySwaggerUi, {
     routePrefix: '/docs',
   });
-
-  server.route(BEETLE_CONSUMERS_GET);
-
-  server.route(BEETLE_TOKENS_GET);
-
-  server.route(BEETLE_TOKENS_POST);
 
   server.route(PEOPLE_POST);
 

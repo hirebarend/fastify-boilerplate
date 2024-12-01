@@ -1,6 +1,4 @@
 HOST: "api.fastifyboilerplate.com" # Replace with your host
-JWT_AUDIENCE: 'fastify-boilerplate-e2107'
-JWT_ISSUER: 'https://securetoken.google.com/fastify-boilerplate-e2107'
 MONGODB_CONNECTION_STRING: "mongodb+srv://..." # Replace with your MongoDB connection string
 MONGODB_DATABASE_NAME: 'fastify-boilerplate' # Replace with your MongoDB database name
 USERNAME: "hirebarend" # Replace with your GitHub username
