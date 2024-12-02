@@ -27,17 +27,21 @@ async function getBlockHash(height: number): Promise<string> {
 async function getSimpleBlock(blockHash: string): Promise<SimpleBlock> {
   const height: number = await getBlockCount();
 
-  const response = await axios.get(
+  const responseBlock = await axios.get<{ height: number }>(
+    `https://blockstream.info/api/block/${blockHash}`,
+  );
+
+  const responseBlockRaw = await axios.get(
     `https://blockstream.info/api/block/${blockHash}/raw`,
     {
       responseType: 'arraybuffer',
     },
   );
 
-  const block = new bitcore.Block(response.data);
+  const block = new bitcore.Block(responseBlockRaw.data);
 
   return {
-    confirmations: 6, // TODO
+    confirmations: height - responseBlock.data.height,
     tx: block.transactions.map((x) => {
       return {
         txid: x.id,

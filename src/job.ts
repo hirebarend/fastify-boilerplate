@@ -53,7 +53,7 @@ export async function job() {
 
     console.log(`height: ${height}`);
 
-    for (let i = height - 3; i <= height; i++) {
+    for (let i = height - 4; i <= height; i++) {
       console.log(`i: ${i}`);
 
       const blockHash = await BitcoinService.getBlockHash(i);
@@ -66,6 +66,6 @@ export async function job() {
       await handleSimpleBlock(simpleBlock);
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 60_000));
+    await new Promise((resolve) => setTimeout(resolve, 8 * 60_000));
   }
 }

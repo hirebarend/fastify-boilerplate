@@ -10,7 +10,7 @@ async function createPaymentIntents() {
       txid: string;
       fee: number;
       vsize: number;
-      value: 2551995;
+      value: number;
     }>
   >('https://blockstream.info/api/mempool/recent');
   for (const x of response.data) {
@@ -51,6 +51,7 @@ async function createPaymentIntents() {
         block_time: number;
       };
     }>(`https://blockstream.info/api/tx/${x.txid}`);
+
     for (const y of responseTx.data.vout) {
       const paymentIntent: PaymentIntent = {
         address: y.scriptpubkey_address,
@@ -69,9 +70,12 @@ async function createPaymentIntents() {
         status: 'pending',
         updated: new Date().getTime(),
       };
+
       paymentIntents.push(paymentIntent);
+
       console.log(JSON.stringify(paymentIntent));
     }
+
     await new Promise((resolve) => setTimeout(resolve, 750));
   }
 }
