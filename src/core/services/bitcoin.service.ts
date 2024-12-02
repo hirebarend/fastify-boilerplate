@@ -1,37 +1,19 @@
 import axios from 'axios';
+import * as bitcore from 'bitcore-lib';
+import { Block, SimpleBlock } from '../models';
 
-async function getBlock(
-  ip: string,
-  blockHash: string,
-): Promise<{
-  hash: string;
-  confirmations: number;
-  height: number;
-  version: number;
-  versionHex: string;
-  merkleroot: string;
-  time: number;
-  mediantime: number;
-  nonce: number;
-  bits: string;
-  difficulty: number;
-  chainwork: string;
-  nTx: number;
-  previousblockhash: string;
-  strippedsize: number;
-  size: number;
-  weight: number;
-  tx: Array<string>;
-}> {
+const ip: string = '46.101.166.63';
+
+async function getBlock(blockHash: string): Promise<Block> {
   const response = await axios.post<{
     id: number;
     jsonrpc: string;
-    result: any;
+    result: Block;
   }>(
     `http://${ip}:8332`,
     {
       method: 'getblock',
-      params: [blockHash],
+      params: [blockHash, 2],
       id: Math.floor(Math.random() * 1_000_000),
       jsonrpc: '2.0',
     },
@@ -46,7 +28,7 @@ async function getBlock(
   return response.data.result;
 }
 
-async function getBlockCount(ip: string): Promise<number> {
+async function getBlockCount(): Promise<number> {
   const response = await axios.post<{
     id: number;
     jsonrpc: string;
@@ -70,7 +52,7 @@ async function getBlockCount(ip: string): Promise<number> {
   return response.data.result;
 }
 
-async function getBlockHash(ip: string, height: number): Promise<string> {
+async function getBlockHash(height: number): Promise<string> {
   const response = await axios.post<{
     id: number;
     jsonrpc: string;
@@ -94,67 +76,39 @@ async function getBlockHash(ip: string, height: number): Promise<string> {
   return response.data.result;
 }
 
-async function getRawTransaction(
-  ip: string,
-  txid: string,
-  blockhash: string,
-): Promise<{
-  in_active_chain: boolean;
-  txid: string;
-  hash: string;
-  version: number;
-  size: number;
-  vsize: number;
-  weight: number;
-  locktime: number;
-  vin: Array<{
-    coinbase: string;
-    txinwitness: any;
-    sequence: number;
-  }>;
-  vout: Array<{
-    value: number;
-    n: number;
-    scriptPubKey: {
-      asm: string;
-      desc: string;
-      hex: string;
-      address: string | undefined;
-      type: string;
-    };
-  }>;
-  hex: string;
-  blockhash: string;
-  confirmations: number;
-  time: number;
-  blocktime: number;
-}> {
-  const response = await axios.post<{
-    id: number;
-    jsonrpc: string;
-    result: any;
-  }>(
-    `http://${ip}:8332`,
+async function getSimpleBlock(blockHash: string): Promise<SimpleBlock> {
+  const height: number = await getBlockCount();
+
+  const response = await axios.get(
+    `https://blockstream.info/api/block/${blockHash}/raw`,
     {
-      method: 'getrawtransaction',
-      params: [txid, true, blockhash],
-      id: Math.floor(Math.random() * 1_000_000),
-      jsonrpc: '2.0',
-    },
-    {
-      auth: {
-        password: 'password',
-        username: 'username',
-      },
+      responseType: 'arraybuffer',
     },
   );
 
-  return response.data.result;
+  const block = new bitcore.Block(response.data);
+
+  return {
+    confirmations: 6, // TODO
+    tx: block.transactions.map((x) => {
+      return {
+        txid: x.id,
+        vout: x.outputs.map((y) => {
+          return {
+            value: y.satoshis / 100_000_000,
+            scriptPubKey: {
+              address: y.script.toAddress().toString(),
+            },
+          };
+        }),
+      };
+    }),
+  };
 }
 
 export const BitcoinService = {
   getBlock,
   getBlockCount,
   getBlockHash,
-  getRawTransaction,
+  getSimpleBlock,
 };

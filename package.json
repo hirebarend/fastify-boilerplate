@@ -6,10 +6,12 @@
     "build": "tsc",
     "lint": "prettier --write --config prettier.config.js --list-different src/**/*.ts",
     "start": "node dist/main.js",
-    "dev": "npm run build && node dist/main.js"
+    "dev": "npm run build && node dist/main.js",
+    "test": "npm run build && node dist/test.js"
   },
   "author": "Barend Erasmus",
   "devDependencies": {
+    "@types/bitcore-lib": "^0.15.6",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "^22.10.1",
     "@types/qs": "^6.9.17",
@@ -24,6 +26,7 @@
     "@fastify/swagger": "^9.4.0",
     "@fastify/swagger-ui": "^5.1.0",
     "axios": "^1.7.8",
+    "bitcore-lib": "^10.5.3",
     "dotenv": "^16.4.5",
     "fastify": "^5.1.0",
     "joi": "^17.13.3",
