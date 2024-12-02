@@ -1,9 +1,9 @@
 import axios from 'axios';
-import * as bitcore from 'bitcore-lib';
 import { Block, SimpleBlock } from '../models';
 
 const ip: string = '46.101.166.63';
 
+// TODO: add caching
 async function getBlock(blockHash: string): Promise<Block> {
   const response = await axios.post<{
     id: number;
@@ -77,33 +77,7 @@ async function getBlockHash(height: number): Promise<string> {
 }
 
 async function getSimpleBlock(blockHash: string): Promise<SimpleBlock> {
-  const height: number = await getBlockCount();
-
-  const response = await axios.get(
-    `https://blockstream.info/api/block/${blockHash}/raw`,
-    {
-      responseType: 'arraybuffer',
-    },
-  );
-
-  const block = new bitcore.Block(response.data);
-
-  return {
-    confirmations: 6, // TODO
-    tx: block.transactions.map((x) => {
-      return {
-        txid: x.id,
-        vout: x.outputs.map((y) => {
-          return {
-            value: y.satoshis / 100_000_000,
-            scriptPubKey: {
-              address: y.script.toAddress().toString(),
-            },
-          };
-        }),
-      };
-    }),
-  };
+  throw new Error('not implemented yet');
 }
 
 export const BitcoinService = {

@@ -2,7 +2,6 @@ import axios from 'axios';
 import * as bitcore from 'bitcore-lib';
 import { Block, SimpleBlock } from '../models';
 
-// TODO: add caching
 async function getBlock(blockHash: string): Promise<Block> {
   throw new Error('not implemented yet!');
 }
