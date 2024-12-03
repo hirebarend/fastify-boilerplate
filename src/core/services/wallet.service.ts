@@ -3,32 +3,33 @@ import {
   generateMnemonic,
   getAddressFromExtendedPublicKey,
   getExtendedPublicKeyFromMnemonic,
+  KeyValueStore,
 } from '../functions';
 import { Wallet } from '../models';
 
-const wallets = createWallets();
+const keyValueStore = KeyValueStore('data');
 
-console.log(JSON.stringify(wallets).length); // 1 418 891
+// createWallets();
 
-function createWallets(): Array<Wallet> {
+function createWallets(): void {
   const numberOfWallets: number = 5_000;
-  const numberOfSubWallets: number = 10;
-
-  const wallets: Array<Wallet> = [];
+  const numberOfSubWallets: number = 50;
 
   for (let i = 0; i < numberOfWallets; i++) {
     const wallet: Wallet = build(`wallet-${i}-${0}`);
 
-    wallets.push(wallet);
+    keyValueStore.set(wallet.address, wallet);
 
     for (let index = 1; index < numberOfSubWallets; index++) {
-      wallets.push(
-        build(`wallet-${i}-${index}`, wallet.extendedPublicKey, index),
+      const subWallet: Wallet = build(
+        `wallet-${i}-${index}`,
+        wallet.extendedPublicKey,
+        index,
       );
+
+      keyValueStore.set(subWallet.address, subWallet);
     }
   }
-
-  return wallets;
 }
 
 function build(
@@ -78,7 +79,7 @@ async function create(
 }
 
 async function findByAddress(address: string): Promise<Wallet | null> {
-  return wallets.find((x) => x.address === address) || null;
+  return keyValueStore.get(address);
 }
 
 export const WalletService = {
