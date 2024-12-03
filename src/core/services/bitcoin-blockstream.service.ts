@@ -1,6 +1,9 @@
 import axios from 'axios';
 import * as bitcore from 'bitcore-lib';
 import { Block, SimpleBlock } from '../models';
+import { cache } from '../functions';
+
+const axiosGet = cache(axios.get);
 
 async function getBlock(blockHash: string): Promise<Block> {
   throw new Error('not implemented yet!');
@@ -22,15 +25,14 @@ async function getBlockHash(height: number): Promise<string> {
   return response.data;
 }
 
-// TODO: add caching
 async function getSimpleBlock(blockHash: string): Promise<SimpleBlock> {
   const height: number = await getBlockCount();
 
-  const responseBlock = await axios.get<{ height: number }>(
+  const responseBlock = await axiosGet(
     `https://blockstream.info/api/block/${blockHash}`,
   );
 
-  const responseBlockRaw = await axios.get(
+  const responseBlockRaw = await axiosGet(
     `https://blockstream.info/api/block/${blockHash}/raw`,
     {
       responseType: 'arraybuffer',

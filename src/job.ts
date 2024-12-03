@@ -4,6 +4,7 @@ import {
   PaymentIntentService,
   SimpleBlock,
 } from './core';
+import { logger } from './logger';
 
 async function handleSimpleBlock(simpleBlock: SimpleBlock) {
   for (const transaction of simpleBlock.tx) {
@@ -20,12 +21,12 @@ async function handleSimpleBlock(simpleBlock: SimpleBlock) {
       }
 
       if (paymentIntent.status === 'confirmed') {
+        logger.info(`payment intent status is already confirmed`);
+
         continue;
       }
 
       if (paymentIntent.amount !== x.value) {
-        // TODO: logging
-        console.log(`expected ${paymentIntent.amount}, got ${x.value}`);
         continue;
       }
 
@@ -37,10 +38,16 @@ async function handleSimpleBlock(simpleBlock: SimpleBlock) {
         simpleBlock.confirmations >= 6 ? 'confirmed' : 'partially_confirmed';
 
       if (paymentIntent.status === status) {
+        logger.verbose(`payment intent status remains unchanged`);
+
         continue;
       }
 
       await PaymentIntentService.updateStatus(paymentIntent.id, status);
+
+      logger.info(
+        `payment intent status changed from ${paymentIntent.status} to ${status}`,
+      );
     }
   }
 }
@@ -51,14 +58,8 @@ export async function job() {
   while (true) {
     const height: number = await BitcoinService.getBlockCount();
 
-    console.log(`height: ${height}`);
-
     for (let i = height - 4; i <= height; i++) {
-      console.log(`i: ${i}`);
-
       const blockHash = await BitcoinService.getBlockHash(i);
-
-      console.log(`blockHash: ${blockHash}`);
 
       const simpleBlock: SimpleBlock =
         await BitcoinService.getSimpleBlock(blockHash);
