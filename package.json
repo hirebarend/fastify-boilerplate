@@ -24,7 +24,7 @@
     "@fastify/swagger": "^9.4.0",
     "@fastify/swagger-ui": "^5.1.0",
     "axios": "^1.7.8",
-    "dotenv": "^16.4.5",
+    "dotenv": "^16.4.6",
     "fastify": "^5.1.0",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
