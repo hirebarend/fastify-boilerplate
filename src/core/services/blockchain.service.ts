@@ -1,13 +1,9 @@
 import axios from 'axios';
 import * as bitcore from 'bitcore-lib';
-import { Block, SimpleBlock } from '../models';
 import { cache } from '../functions';
+import { Transaction } from '../models';
 
 const axiosGet = cache(axios.get);
-
-async function getBlock(blockHash: string): Promise<Block> {
-  throw new Error('not implemented yet!');
-}
 
 async function getBlockCount(): Promise<number> {
   const response = await axios.get<number>(
@@ -25,12 +21,16 @@ async function getBlockHash(height: number): Promise<string> {
   return response.data;
 }
 
-async function getSimpleBlock(blockHash: string): Promise<SimpleBlock> {
+async function getTransactionFromBlockHash(
+  blockHash: string,
+): Promise<Array<Transaction>> {
   const height: number = await getBlockCount();
 
   const responseBlock = await axiosGet(
     `https://blockstream.info/api/block/${blockHash}`,
   );
+
+  const confirmations: number = height - responseBlock.data.height;
 
   const responseBlockRaw = await axiosGet(
     `https://blockstream.info/api/block/${blockHash}/raw`,
@@ -41,27 +41,26 @@ async function getSimpleBlock(blockHash: string): Promise<SimpleBlock> {
 
   const block = new bitcore.Block(responseBlockRaw.data);
 
-  return {
-    confirmations: height - responseBlock.data.height,
-    tx: block.transactions.map((x) => {
-      return {
-        txid: x.id,
-        vout: x.outputs.map((y) => {
-          return {
-            value: y.satoshis / 100_000_000,
-            scriptPubKey: {
-              address: y.script.toAddress().toString(),
-            },
-          };
-        }),
-      };
-    }),
-  };
+  return block.transactions
+    .map((transaction) => {
+      return transaction.outputs.map((output, index: number) => {
+        return {
+          from: transaction.inputs
+            .filter((x) => x.script)
+            .map((x) => x.script.toAddress().toString()),
+          id: `${transaction.id}_${index}`,
+          status: confirmations >= 6 ? 'confirmed' : 'partially_confirmed',
+          timestamp: block.header.time,
+          to: output.script.toAddress().toString(),
+          value: output.satoshis / 100_000_000,
+        } as Transaction;
+      });
+    })
+    .reduce((a, b) => a.concat(b));
 }
 
-export const BitcoinBlockStreamService = {
-  getBlock,
+export const BlockchainService = {
   getBlockCount,
   getBlockHash,
-  getSimpleBlock,
+  getTransactionFromBlockHash,
 };

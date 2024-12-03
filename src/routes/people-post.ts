@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest, RouteOptions } from 'fastify';
 import { faker } from '@faker-js/faker';
 import { Collection } from 'mongodb';
-import { getContainer, Person } from '../core';
+import { getContainer } from '../core';
 
 export const PEOPLE_POST: RouteOptions<any, any, any, any> = {
   handler: async (
@@ -10,23 +10,23 @@ export const PEOPLE_POST: RouteOptions<any, any, any, any> = {
   ) => {
     const container = await getContainer();
 
-    const collection: Collection<Person> =
-      container.db.collection<Person>('people');
+    // const collection: Collection<Person> =
+    //   container.db.collection<Person>('people');
 
-    const person: Person = {
-      firstName: request.body.firstName,
-      id: faker.string.alphanumeric({
-        casing: 'lower',
-        length: 8,
-      }),
-      lastName: request.body.lastName,
-    };
+    // const person: Person = {
+    //   firstName: request.body.firstName,
+    //   id: faker.string.alphanumeric({
+    //     casing: 'lower',
+    //     length: 8,
+    //   }),
+    //   lastName: request.body.lastName,
+    // };
 
-    await collection.insertOne({
-      ...person,
-    });
+    // await collection.insertOne({
+    //   ...person,
+    // });
 
-    reply.status(200).send(person);
+    // reply.status(200).send(person);
   },
   method: 'POST',
   url: '/api/v1/people',
