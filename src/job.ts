@@ -3,11 +3,19 @@ import {
   PaymentIntent,
   PaymentIntentService,
   Transaction,
+  Wallet,
+  WalletService,
 } from './core';
 import { logger } from './logger';
 
 async function handleTransactions(transactions: Array<Transaction>) {
   for (const transaction of transactions) {
+    const wallet: Wallet | null = await WalletService.findByAddress(
+      transaction.to,
+    );
+
+    // TODO
+
     let paymentIntent: PaymentIntent | null =
       await PaymentIntentService.findByAddress(transaction.to);
 
@@ -41,14 +49,10 @@ async function handleTransactions(transactions: Array<Transaction>) {
 }
 
 export async function job() {
-  await PaymentIntentService.createPaymentIntents();
-
   while (true) {
     let height: number = await BlockchainService.getBlockCount();
 
-    height = 872451 + 1;
-
-    for (let i = height - 4; i <= height; i++) {
+    for (let i = 872451 - 3; i <= height; i++) {
       const blockHash = await BlockchainService.getBlockHash(i);
 
       const transactions =
