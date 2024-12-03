@@ -8,15 +8,23 @@ import { Wallet } from '../models';
 
 const wallets = createWallets();
 
+console.log(JSON.stringify(wallets).length); // 1 418 891
+
 function createWallets(): Array<Wallet> {
   const numberOfWallets: number = 5_000;
-  const numberOfSubWallets: number = 100;
+  const numberOfSubWallets: number = 10;
 
   const wallets: Array<Wallet> = [];
 
   for (let i = 0; i < numberOfWallets; i++) {
+    const wallet: Wallet = build(`wallet-${i}-${0}`);
+
+    wallets.push(wallet);
+
     for (let index = 1; index < numberOfSubWallets; index++) {
-      wallets.push(build(`wallet-${i}-${index}`, null, index));
+      wallets.push(
+        build(`wallet-${i}-${index}`, wallet.extendedPublicKey, index),
+      );
     }
   }
 

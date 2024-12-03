@@ -14,7 +14,9 @@ async function handleTransactions(transactions: Array<Transaction>) {
       transaction.to,
     );
 
-    // TODO
+    if (wallet) {
+      logger.error(`wallet found`);
+    }
 
     let paymentIntent: PaymentIntent | null =
       await PaymentIntentService.findByAddress(transaction.to);

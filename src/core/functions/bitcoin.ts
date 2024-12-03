@@ -27,7 +27,7 @@ function convertExtendedPublicKey(extendedPublicKey: string): string {
 }
 
 export function generateMnemonic(): string {
-  return bip39.generateMnemonic(12);
+  return bip39.generateMnemonic();
 }
 
 export function getAddressFromExtendedPublicKey(
