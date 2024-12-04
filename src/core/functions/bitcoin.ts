@@ -41,7 +41,7 @@ export function getAddressFromExtendedPublicKey(
   const publicKey = bip32Interface.derive(index).publicKey;
 
   const payment = bitcoin.payments.p2wpkh({
-    pubkey: publicKey,
+    pubkey: Buffer.from(publicKey),
     network: bitcoin.networks.bitcoin,
   });
 
