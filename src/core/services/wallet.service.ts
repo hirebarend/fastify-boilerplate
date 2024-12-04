@@ -3,34 +3,9 @@ import {
   generateMnemonic,
   getAddressFromExtendedPublicKey,
   getExtendedPublicKeyFromMnemonic,
-  KeyValueStore,
 } from '../functions';
 import { Wallet } from '../models';
-
-const keyValueStore = KeyValueStore('data');
-
-// createWallets();
-
-function createWallets(): void {
-  const numberOfWallets: number = 5_000;
-  const numberOfSubWallets: number = 50;
-
-  for (let i = 0; i < numberOfWallets; i++) {
-    const wallet: Wallet = build(`wallet-${i}-${0}`);
-
-    keyValueStore.set(wallet.address, wallet);
-
-    for (let index = 1; index < numberOfSubWallets; index++) {
-      const subWallet: Wallet = build(
-        `wallet-${i}-${index}`,
-        wallet.extendedPublicKey,
-        index,
-      );
-
-      keyValueStore.set(subWallet.address, subWallet);
-    }
-  }
-}
+import { getContainer } from '../container';
 
 function build(
   name: string,
@@ -38,7 +13,7 @@ function build(
   index: number = 0,
 ): Wallet {
   if (!extendedPublicKey) {
-    const mnemonic = generateMnemonic();
+    const mnemonic: string = generateMnemonic();
 
     extendedPublicKey = getExtendedPublicKeyFromMnemonic(mnemonic);
 
@@ -71,19 +46,44 @@ async function create(
   extendedPublicKey: string | null = null,
   index: number = 0,
 ): Promise<Wallet> {
+  const container = await getContainer();
+
+  const collection = container.db.collection<Wallet>('wallets');
+
   const wallet: Wallet = build(name, extendedPublicKey, index);
 
-  // TODO
+  await collection.insertOne({
+    address: wallet.address,
+    extendedPublicKey: wallet.extendedPublicKey,
+    id: wallet.id,
+    index: wallet.index,
+    mnemonic: wallet.mnemonic,
+    name: wallet.name,
+  });
 
   return wallet;
 }
 
 async function findByAddress(address: string): Promise<Wallet | null> {
-  return keyValueStore.get(address);
+  const container = await getContainer();
+
+  const collection = container.db.collection<Wallet>('wallets');
+
+  const document = await collection.findOne(
+    {
+      address,
+    },
+    {
+      projection: {
+        _id: 0,
+      },
+    },
+  );
+
+  return document;
 }
 
 export const WalletService = {
-  build,
   create,
   findByAddress,
 };

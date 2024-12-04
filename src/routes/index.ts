@@ -1,1 +1,2 @@
-export * from './people-post';
+export * from './payment-intents-get';
+export * from './payment-intents-post';

@@ -3,7 +3,7 @@ import fastifyCors from '@fastify/cors';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
 import * as qs from 'qs';
-import { PEOPLE_POST } from './routes';
+import { PAYMENT_INTENTS_GET, PAYMENT_INTENTS_POST } from './routes';
 import { Logger } from './hooks';
 
 export async function startServer() {
@@ -76,7 +76,9 @@ export async function startServer() {
     routePrefix: '/docs',
   });
 
-  server.route(PEOPLE_POST);
+  server.route(PAYMENT_INTENTS_GET);
+
+  server.route(PAYMENT_INTENTS_POST);
 
   server.route({
     handler: async (request, reply) => {
