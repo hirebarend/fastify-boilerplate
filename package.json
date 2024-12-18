@@ -1,7 +1,7 @@
 {
-  "name": "fastify-boilerplate",
+  "name": "kubetls",
   "version": "1.0.0",
-  "description": "The Fastify boilerplate with all you need to build your SaaS, AI tool, or any other web app and make your first $ online fast.",
+  "description": "KubeTLS adds certificates as secrets in Kubernetes clusters, and simplifies the process of obtaining and renewing those certificates.",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "scripts": {
@@ -13,8 +13,11 @@
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^22.10.1",
     "@types/qs": "^6.9.17",
+    "@types/request": "^2.48.12",
+    "@types/ws": "^8.5.13",
     "jest": "^29.7.0",
     "prettier": "^3.4.2",
     "typescript": "^5.6.3"

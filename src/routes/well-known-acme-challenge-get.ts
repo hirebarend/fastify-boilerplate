@@ -7,7 +7,7 @@ export const WELL_KNOWN_ACME_CHALLENGE_GET: RouteOptions<any, any, any, any> = {
     reply: FastifyReply,
   ) => {
     let certificateSigningRequest = await findCertificateSigninRequest(
-      request.hostname,
+      request.headers.host || '',
     );
 
     if (!certificateSigningRequest) {
