@@ -1,4 +1,0 @@
-HOST: "api.fastifyboilerplate.com" # Replace with your host
-MONGODB_CONNECTION_STRING: "mongodb+srv://..." # Replace with your MongoDB connection string
-MONGODB_DATABASE_NAME: 'fastify-boilerplate' # Replace with your MongoDB database name
-USERNAME: "hirebarend" # Replace with your GitHub username
