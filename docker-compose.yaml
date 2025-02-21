@@ -14,6 +14,7 @@ services:
       - ./nginx/vhost:/etc/nginx/vhost.d
       - ./nginx/html:/usr/share/nginx/html
       - ./nginx/dhparam:/etc/nginx/dhparam
+      - ./nginx/conf.d:/etc/nginx/conf.d
     environment:
       - ENABLE_IPV6=true
     networks:
