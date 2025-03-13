@@ -50,6 +50,13 @@ services:
       - VIRTUAL_PORT=8080
     networks:
       - proxy_network
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_POLL_INTERVAL=900
 
 networks:
   proxy_network:
