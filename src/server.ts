@@ -3,8 +3,8 @@ import fastifyCors from '@fastify/cors';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
 import * as qs from 'qs';
-import { Logger } from './hooks';
-import { PEOPLE_POST } from './routes';
+import { Logger } from './hooks/index.js';
+import { PEOPLE_POST } from './routes/index.js';
 
 export async function startServer() {
   const server = fastify({

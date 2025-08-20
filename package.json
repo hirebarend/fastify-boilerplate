@@ -2,8 +2,7 @@
   "name": "fastify-boilerplate",
   "version": "1.0.0",
   "description": "The Fastify boilerplate with all you need to build your SaaS, AI tool, or any other web app and make your first $ online fast.",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "type": "module",
   "scripts": {
     "build": "tsc",
     "dev": "npm run build && node dist/main.js",
@@ -13,7 +12,7 @@
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
-    "@types/node": "^22.17.2",
+    "@types/node": "^24.3.0",
     "@types/qs": "^6.14.0",
     "jest": "^30.0.5",
     "prettier": "^3.6.2",

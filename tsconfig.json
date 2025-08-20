@@ -1,10 +1,14 @@
 {
   "compilerOptions": {
-    "declaration": true,
-    "module": "commonjs",
-    "outDir": "dist",
+    "lib": ["ES2023"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
     "strict": true,
-    "target": "ESNext"
+    "target": "ES2023",
+    "types": ["node", "jest"]
   },
-  "include": ["./src/**/*"]
+  "include": ["src"]
 }

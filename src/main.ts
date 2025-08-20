@@ -1,8 +1,8 @@
 import cluster from 'cluster';
 require('dotenv').config();
 import * as os from 'os';
-import { startServer } from './server';
-import { job } from './job';
+import { startServer } from './server.js';
+import { job } from './job.js';
 
 if (process.env.JOB) {
   job();
