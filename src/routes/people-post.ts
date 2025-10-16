@@ -1,7 +1,9 @@
-import { FastifyReply, FastifyRequest, RouteOptions } from 'fastify';
 import { faker } from '@faker-js/faker';
 import { Collection } from 'mongodb';
-import { getContainer, Person } from '../core/index.js';
+import { getContainer } from '../core/index.js';
+
+import type { FastifyReply, FastifyRequest, RouteOptions } from 'fastify';
+import type { Person } from '../core/index.js';
 
 export const PEOPLE_POST: RouteOptions<any, any, any, any> = {
   handler: async (

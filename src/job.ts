@@ -1,4 +1,6 @@
-import { Container, disposeContainer, getContainer } from './core/index.js';
+import { disposeContainer, getContainer } from './core/index.js';
+
+import type { Container } from './core/index.js';
 
 export async function job() {
   const container: Container = await getContainer();

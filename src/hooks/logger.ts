@@ -1,4 +1,8 @@
-import { FastifyReply, FastifyRequest, HookHandlerDoneFunction } from 'fastify';
+import type {
+  FastifyReply,
+  FastifyRequest,
+  HookHandlerDoneFunction,
+} from 'fastify';
 import { Collection, Db, MongoClient } from 'mongodb';
 
 export async function Logger(
