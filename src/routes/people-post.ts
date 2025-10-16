@@ -1,4 +1,3 @@
-import { faker } from '@faker-js/faker';
 import { Collection } from 'mongodb';
 import { getContainer } from '../core/index.js';
 
@@ -10,6 +9,8 @@ export const PEOPLE_POST: RouteOptions<any, any, any, any> = {
     request: FastifyRequest<{ Body: { firstName: string; lastName: string } }>,
     reply: FastifyReply,
   ) => {
+    const { faker } = await import('@faker-js/faker');
+
     const container = await getContainer();
 
     const collection: Collection<Person> =

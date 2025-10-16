@@ -2,13 +2,13 @@
   "name": "fastify-boilerplate",
   "version": "1.0.0",
   "description": "The Fastify boilerplate with all you need to build your SaaS, AI tool, or any other web app and make your first $ online fast.",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
-    "build": "tsc",
-    "dev": "npm run build && node dist/main.js",
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx watch src/main.ts",
     "lint": "prettier --write --config prettier.config.js --list-different src/**/*.ts",
-    "start": "node ./dist/main.js",
-    "test": "jest --coverage"
+    "start": "node dist/main.js",
+    "test": "jest"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
@@ -17,6 +17,7 @@
     "jest": "^30.2.0",
     "prettier": "^3.6.2",
     "ts-jest": "^29.4.5",
+    "tsx": "^4.20.6",
     "typescript": "^5.9.3"
   },
   "dependencies": {
