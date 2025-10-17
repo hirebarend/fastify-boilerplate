@@ -1,1 +1,1 @@
-export * from './people-post.js';
+export * from './people-post';
