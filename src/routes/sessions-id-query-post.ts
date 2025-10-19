@@ -3,7 +3,7 @@ import * as crypto from 'crypto';
 import { DuckDBConnection } from '@duckdb/node-api';
 
 import type { FastifyReply, FastifyRequest, RouteOptions } from 'fastify';
-import { getContainer, Query, type File } from '../core';
+import { getContainer, Query, SessionFile } from '../core';
 
 function normalizeFilename(str: string): string {
   const strSplitted = str.split('.');
@@ -17,7 +17,7 @@ function normalizeFilename(str: string): string {
     .replace(/^-+|-+$/g, '');
 }
 
-async function executeQuery(files: Array<File>, query: string) {
+async function executeQuery(sessionFiles: Array<SessionFile>, query: string) {
   const connection = await DuckDBConnection.create();
 
   try {
@@ -30,11 +30,11 @@ async function executeQuery(files: Array<File>, query: string) {
     await connection.run(`PRAGMA cache_httpfs_cache_directory='./tmp';`);
     await connection.run(`PRAGMA cache_httpfs_cache_block_size=1048576;`);
 
-    for (const file of files) {
+    for (const sessionFile of sessionFiles) {
       try {
         await connection.run(`
-      CREATE TEMP VIEW "${normalizeFilename(file.name)}" AS
-      SELECT * FROM read_csv_auto('${file.url}', header=true)
+      CREATE TEMP VIEW "${normalizeFilename(sessionFile.name)}" AS
+      SELECT * FROM read_csv_auto('${sessionFile.url}', header=true)
     `);
       } catch {}
     }
@@ -72,15 +72,22 @@ export const SESSIONS_ID_QUERY_POST: RouteOptions<any, any, any, any> = {
 
     const container = await getContainer();
 
-    const files = await container.db
-      .collection<File>('files')
-      .find({
-        'session.id': request.params.id,
-      })
+    const sessionFiles = await container.db
+      .collection<SessionFile>('session-files')
+      .find(
+        {
+          'session.id': request.params.id,
+        },
+        {
+          projection: {
+            _id: -1,
+          },
+        },
+      )
       .toArray();
 
     const { columns, elapsed, rows } = await executeQuery(
-      files,
+      sessionFiles,
       request.body.query,
     );
 

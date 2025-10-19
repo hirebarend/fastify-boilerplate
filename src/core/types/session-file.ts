@@ -1,8 +1,4 @@
-export type File = {
-  contentType: string;
-
-  hash: string;
-
+export type SessionFile = {
   id: string;
 
   metadata: {
@@ -16,8 +12,6 @@ export type File = {
   session: {
     id: string;
   };
-
-  size: number;
 
   url: string;
 };
