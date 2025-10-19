@@ -50,6 +50,17 @@ export const SESSIONS_ID_FILES_POST: RouteOptions<any, any, any, any> = {
   url: '/api/v1/sessions/:id/files',
   schema: {
     tags: ['sessions'],
+    body: {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+        },
+        url: {
+          type: 'string',
+        },
+      },
+    },
     params: {
       type: 'object',
       properties: {
