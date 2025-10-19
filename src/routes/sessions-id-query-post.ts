@@ -80,7 +80,7 @@ export const SESSIONS_ID_QUERY_POST: RouteOptions<any, any, any, any> = {
         },
         {
           projection: {
-            _id: -1,
+            _id: 0,
           },
         },
       )
