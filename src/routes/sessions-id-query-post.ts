@@ -1,7 +1,9 @@
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import * as crypto from 'crypto';
 import duckdb, { DuckDBConnection } from '@duckdb/node-api';
 
 import type { FastifyReply, FastifyRequest, RouteOptions } from 'fastify';
-import { getContainer } from '../core';
+import { getContainer, Query } from '../core';
 
 function normalizeFilename(str: string): string {
   const strSplitted = str.split('.');
@@ -25,6 +27,8 @@ export const SESSIONS_ID_QUERY_POST: RouteOptions<any, any, any, any> = {
     }>,
     reply: FastifyReply,
   ) => {
+    const { faker } = await import('@faker-js/faker');
+
     const container = await getContainer();
 
     const connection = await DuckDBConnection.create();
@@ -61,9 +65,49 @@ export const SESSIONS_ID_QUERY_POST: RouteOptions<any, any, any, any> = {
 
     connection.closeSync();
 
+    const buffer = Buffer.from(
+      [columns.join(','), ...rows.map((row) => row.join(','))].join('\n'),
+    );
+
+    const s3Client = new S3Client({ region: process.env.AWS_REGION });
+
+    const hash: string = crypto.createHash('md5').update(buffer).digest('hex');
+
+    await s3Client.send(
+      new PutObjectCommand({
+        ACL: 'public-read',
+        Body: buffer,
+        Bucket: process.env.AWS_S3_BUCKET,
+        ContentType: 'text/csv',
+        Key: hash,
+      }),
+    );
+
+    const query: Query = {
+      contentType: 'text/csv',
+      hash,
+      id: faker.string.alphanumeric({
+        casing: 'lower',
+        length: 8,
+      }),
+      metadata: {
+        columns,
+        count: rows.length,
+        elapsed,
+      },
+      name: '',
+      query: request.body.query,
+      session: {
+        id: request.params.id,
+      },
+      size: buffer.length,
+      url: `https://${process.env.AWS_S3_BUCKET}.s3.amazonaws.com/${hash}`,
+    };
+
+    await container.db.collection<Query>('queries').insertOne(query);
+
     reply.status(200).send({
-      columns,
-      elapsed,
+      ...query,
       rows,
     });
   },

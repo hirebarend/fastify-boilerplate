@@ -1,6 +1,8 @@
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import * as crypto from 'crypto';
+import { DuckDBConnection } from '@duckdb/node-api';
 import { FastifyReply, FastifyRequest, RouteOptions } from 'fastify';
-import { getContainer } from '../core';
+import { File, getContainer } from '../core';
 
 export const FILES_POST: RouteOptions<any, any, any, any> = {
   handler: async (
@@ -10,7 +12,7 @@ export const FILES_POST: RouteOptions<any, any, any, any> = {
     }>,
     reply: FastifyReply,
   ) => {
-    const { S3Client, PutObjectCommand } = await import('@aws-sdk/client-s3');
+    const { faker } = await import('@faker-js/faker');
 
     const container = await getContainer();
 
@@ -32,17 +34,39 @@ export const FILES_POST: RouteOptions<any, any, any, any> = {
       }),
     );
 
-    await container.db.collection('files').insertOne({
+    const connection = await DuckDBConnection.create();
+
+    const readerResult = await connection.runAndReadAll(
+      `SELECT COUNT(*) FROM read_csv_auto('${`https://${process.env.AWS_S3_BUCKET}.s3.amazonaws.com/${hash}`}', header=true)`,
+    );
+
+    const rows = readerResult.getRowsJson();
+
+    connection.closeSync();
+
+    const file: File = {
+      contentType:
+        request.headers['content-type'] || 'application/octet-stream',
+      hash,
+      id: faker.string.alphanumeric({
+        casing: 'lower',
+        length: 8,
+      }),
+      metadata: {
+        columns: [],
+        count: rows[0][0] as number,
+      },
       name: request.query.name,
       session: {
         id: request.query.sessionId,
       },
+      size: request.body.length || 0,
       url: `https://${process.env.AWS_S3_BUCKET}.s3.amazonaws.com/${hash}`,
-    });
+    };
 
-    reply.status(200).send({
-      url: `https://${process.env.AWS_S3_BUCKET}.s3.amazonaws.com/${hash}`,
-    });
+    await container.db.collection<File>('files').insertOne(file);
+
+    reply.status(200).send(file);
   },
   method: 'POST',
   url: '/api/v1/files',

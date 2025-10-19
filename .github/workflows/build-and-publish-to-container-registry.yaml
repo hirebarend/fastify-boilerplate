@@ -2,7 +2,7 @@ name: Build and publish to Container Registry
 
 on:
   push:
-    branches: ['main']
+    branches: ['lumino']
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
