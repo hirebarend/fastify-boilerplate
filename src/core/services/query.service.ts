@@ -1,4 +1,4 @@
-import { DuckDBConnection } from '@duckdb/node-api';
+import duckdb, { DuckDBConnection, DuckDBInstance } from '@duckdb/node-api';
 import fs from 'node:fs';
 import OpenAI from 'openai';
 
@@ -20,17 +20,23 @@ export async function executePrompt(
   query: string,
   sessionFiles: Array<SessionFile>,
 ) {
-  const connection = await DuckDBConnection.create();
+  const instance = await DuckDBInstance.create(':memory:');
+
+  const connection = await DuckDBConnection.create(instance);
 
   try {
-    await connection.run(`INSTALL httpfs;`);
-    // await connection.run(`INSTALL cache_httpfs FROM community;`);
-    await connection.run(`LOAD httpfs;`);
-    // await connection.run(`LOAD cache_httpfs;`);
+    // const extensions = await connection.runAndReadAll(
+    //   'PRAGMA show_extensions;',
+    // );
 
-    // await connection.run(`PRAGMA cache_httpfs_type='on_disk';`);
-    // await connection.run(`PRAGMA cache_httpfs_cache_directory='./tmp';`);
-    // await connection.run(`PRAGMA cache_httpfs_cache_block_size=1048576;`);
+    await connection.run(`INSTALL httpfs;`);
+    await connection.run(`INSTALL cache_httpfs FROM community;`);
+    await connection.run(`LOAD httpfs;`);
+    await connection.run(`LOAD cache_httpfs;`);
+
+    await connection.run(`PRAGMA cache_httpfs_type='on_disk';`);
+    await connection.run(`PRAGMA cache_httpfs_cache_directory='./tmp';`);
+    await connection.run(`PRAGMA cache_httpfs_cache_block_size=1048576;`);
 
     const tables = [];
 
@@ -99,17 +105,19 @@ export async function executeQuery(
   query: string,
   sessionFiles: Array<SessionFile>,
 ) {
-  const connection = await DuckDBConnection.create();
+  const instance = await DuckDBInstance.create(':memory:');
+
+  const connection = await DuckDBConnection.create(instance);
 
   try {
     await connection.run(`INSTALL httpfs;`);
-    // await connection.run(`INSTALL cache_httpfs FROM community;`);
+    await connection.run(`INSTALL cache_httpfs FROM community;`);
     await connection.run(`LOAD httpfs;`);
-    // await connection.run(`LOAD cache_httpfs;`);
+    await connection.run(`LOAD cache_httpfs;`);
 
-    // await connection.run(`PRAGMA cache_httpfs_type='on_disk';`);
-    // await connection.run(`PRAGMA cache_httpfs_cache_directory='./tmp';`);
-    // await connection.run(`PRAGMA cache_httpfs_cache_block_size=1048576;`);
+    await connection.run(`PRAGMA cache_httpfs_type='on_disk';`);
+    await connection.run(`PRAGMA cache_httpfs_cache_directory='./tmp';`);
+    await connection.run(`PRAGMA cache_httpfs_cache_block_size=1048576;`);
 
     for (const sessionFile of sessionFiles) {
       try {
