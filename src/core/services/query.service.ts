@@ -93,7 +93,7 @@ export async function executePrompt(
         tables
           .map(
             (table) =>
-              `\tTABLE: ${table.name}\n${table.rows.map((row) => `\t${row.join(', ')}`).join('\n')}`,
+              `\tTABLE: ${table.name}\n${table.rows.map((row) => `\t${row.map((column) => (column?.toString().includes(',') ? `"${column}"` : column)).join(', ')}`).join('\n')}`,
           )
           .join('\n'),
       );
