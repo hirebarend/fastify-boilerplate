@@ -81,12 +81,7 @@ export async function executePrompt(
     const str = resp.choices?.[0]?.message?.content;
 
     if (!str || str === 'ERROR') {
-      return {
-        columns: [],
-        elapsed: 0,
-        query: str,
-        rows: [],
-      };
+      throw new Error('unable to parse prompt');
     }
 
     const result = await executeQuery(str, sessionFiles);
