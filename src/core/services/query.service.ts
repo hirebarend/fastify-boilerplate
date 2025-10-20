@@ -1,4 +1,4 @@
-import duckdb, { DuckDBConnection, DuckDBInstance } from '@duckdb/node-api';
+import { DuckDBConnection, DuckDBInstance } from '@duckdb/node-api';
 import fs from 'node:fs';
 import OpenAI from 'openai';
 
@@ -98,6 +98,7 @@ export async function executePrompt(
     };
   } finally {
     connection.closeSync();
+    instance.closeSync();
   }
 }
 
@@ -144,5 +145,6 @@ export async function executeQuery(
     };
   } finally {
     connection.closeSync();
+    instance.closeSync();
   }
 }
