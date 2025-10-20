@@ -1,0 +1,145 @@
+import { DuckDBConnection } from '@duckdb/node-api';
+import fs from 'node:fs';
+import OpenAI from 'openai';
+
+import type { SessionFile } from '../types';
+
+function normalizeFilename(str: string): string {
+  const strSplitted = str.split('.');
+
+  return strSplitted[0]
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^-+|-+$/g, '');
+}
+
+export async function executePrompt(
+  query: string,
+  sessionFiles: Array<SessionFile>,
+) {
+  const connection = await DuckDBConnection.create();
+
+  try {
+    await connection.run(`INSTALL httpfs;`);
+    await connection.run(`INSTALL cache_httpfs FROM community;`);
+    await connection.run(`LOAD httpfs;`);
+    await connection.run(`LOAD cache_httpfs;`);
+
+    await connection.run(`PRAGMA cache_httpfs_type='on_disk';`);
+    await connection.run(`PRAGMA cache_httpfs_cache_directory='./tmp';`);
+    await connection.run(`PRAGMA cache_httpfs_cache_block_size=1048576;`);
+
+    const tables = [];
+
+    for (const sessionFile of sessionFiles) {
+      const readerResult = await connection.runAndReadAll(
+        `SELECT * FROM read_csv_auto('${sessionFile.url}', header=true) USING SAMPLE 10 ROWS;`,
+      );
+
+      tables.push({
+        name: normalizeFilename(sessionFile.name),
+        columns: readerResult.columnNames(),
+        rows: readerResult.getRowsJson(),
+      });
+    }
+
+    const content = fs
+      .readFileSync('./prompts/sql_query.md', 'utf-8')
+      .replace('{{USER_PROMPT}}', query)
+      .replace(
+        '{{TABLES_AND_COLUMNS}}',
+        tables
+          .map((table) => `\t${table.name}(${table.columns.join(', ')})`)
+          .join('\n'),
+      )
+      .replace(
+        '{{ROW_SAMPLES}}',
+        tables
+          .map(
+            (table) =>
+              `\tTABLE: ${table.name}\n${table.rows.map((row) => `\t${row.join(', ')}`).join('\n')}`,
+          )
+          .join('\n'),
+      );
+
+    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+    const resp = await client.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        {
+          role: 'user',
+          content,
+        },
+      ],
+      temperature: 0,
+    });
+
+    const str = resp.choices?.[0]?.message?.content;
+
+    if (!str || str === 'ERROR') {
+      return {
+        columns: [],
+        elapsed: 0,
+        query: str,
+        rows: [],
+      };
+    }
+
+    const result = await executeQuery(str, sessionFiles);
+
+    return {
+      ...result,
+      query: str,
+    };
+  } finally {
+    connection.closeSync();
+  }
+}
+
+export async function executeQuery(
+  query: string,
+  sessionFiles: Array<SessionFile>,
+) {
+  const connection = await DuckDBConnection.create();
+
+  try {
+    await connection.run(`INSTALL httpfs;`);
+    await connection.run(`INSTALL cache_httpfs FROM community;`);
+    await connection.run(`LOAD httpfs;`);
+    await connection.run(`LOAD cache_httpfs;`);
+
+    await connection.run(`PRAGMA cache_httpfs_type='on_disk';`);
+    await connection.run(`PRAGMA cache_httpfs_cache_directory='./tmp';`);
+    await connection.run(`PRAGMA cache_httpfs_cache_block_size=1048576;`);
+
+    for (const sessionFile of sessionFiles) {
+      try {
+        await connection.run(`
+        CREATE TEMP VIEW "${normalizeFilename(sessionFile.name)}" AS
+        SELECT * FROM read_csv_auto('${sessionFile.url}', header=true)
+      `);
+      } catch {}
+    }
+
+    const start = new Date().getTime();
+    const readerResult = await connection.runAndReadAll(query);
+    const end = new Date().getTime();
+    const elapsed = end - start;
+
+    const columns = readerResult.columnNames();
+
+    const rows = readerResult.getRowsJson();
+
+    return {
+      columns,
+      elapsed,
+      rows,
+    };
+  } finally {
+    connection.closeSync();
+  }
+}
