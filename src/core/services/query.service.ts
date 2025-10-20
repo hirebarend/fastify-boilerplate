@@ -69,7 +69,7 @@ export async function executePrompt(
 
     for (const sessionFile of sessionFiles) {
       const readerResult = await connection.runAndReadAll(
-        `SELECT * FROM read_csv_auto('${getFilenameFromUrl(sessionFile.url)}', header=true) USING SAMPLE 10 ROWS;`,
+        `SELECT * FROM read_csv_auto('${await getFilenameFromUrl(sessionFile.url)}', header=true) USING SAMPLE 10 ROWS;`,
       );
 
       tables.push({
@@ -141,7 +141,7 @@ export async function executeQuery(
     for (const sessionFile of sessionFiles) {
       await connection.run(`
         CREATE TEMP VIEW "${normalizeFilename(sessionFile.name)}" AS
-        SELECT * FROM read_csv_auto('${getFilenameFromUrl(sessionFile.url)}', header=true)
+        SELECT * FROM read_csv_auto('${await getFilenameFromUrl(sessionFile.url)}', header=true)
       `);
     }
 
