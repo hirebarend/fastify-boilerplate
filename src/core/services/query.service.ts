@@ -139,12 +139,10 @@ export async function executeQuery(
 
   try {
     for (const sessionFile of sessionFiles) {
-      try {
-        await connection.run(`
+      await connection.run(`
         CREATE TEMP VIEW "${normalizeFilename(sessionFile.name)}" AS
         SELECT * FROM read_csv_auto('${getFilenameFromUrl(sessionFile.url)}', header=true)
       `);
-      } catch {}
     }
 
     const start = new Date().getTime();
