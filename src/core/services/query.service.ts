@@ -23,14 +23,14 @@ export async function executePrompt(
   const connection = await DuckDBConnection.create();
 
   try {
-    await connection.run(`INSTALL httpfs;`);
-    await connection.run(`INSTALL cache_httpfs FROM community;`);
-    await connection.run(`LOAD httpfs;`);
-    await connection.run(`LOAD cache_httpfs;`);
+    // await connection.run(`INSTALL httpfs;`);
+    // await connection.run(`INSTALL cache_httpfs FROM community;`);
+    // await connection.run(`LOAD httpfs;`);
+    // await connection.run(`LOAD cache_httpfs;`);
 
-    await connection.run(`PRAGMA cache_httpfs_type='on_disk';`);
-    await connection.run(`PRAGMA cache_httpfs_cache_directory='./tmp';`);
-    await connection.run(`PRAGMA cache_httpfs_cache_block_size=1048576;`);
+    // await connection.run(`PRAGMA cache_httpfs_type='on_disk';`);
+    // await connection.run(`PRAGMA cache_httpfs_cache_directory='./tmp';`);
+    // await connection.run(`PRAGMA cache_httpfs_cache_block_size=1048576;`);
 
     const tables = [];
 
@@ -102,14 +102,14 @@ export async function executeQuery(
   const connection = await DuckDBConnection.create();
 
   try {
-    await connection.run(`INSTALL httpfs;`);
-    await connection.run(`INSTALL cache_httpfs FROM community;`);
-    await connection.run(`LOAD httpfs;`);
-    await connection.run(`LOAD cache_httpfs;`);
+    // await connection.run(`INSTALL httpfs;`);
+    // await connection.run(`INSTALL cache_httpfs FROM community;`);
+    // await connection.run(`LOAD httpfs;`);
+    // await connection.run(`LOAD cache_httpfs;`);
 
-    await connection.run(`PRAGMA cache_httpfs_type='on_disk';`);
-    await connection.run(`PRAGMA cache_httpfs_cache_directory='./tmp';`);
-    await connection.run(`PRAGMA cache_httpfs_cache_block_size=1048576;`);
+    // await connection.run(`PRAGMA cache_httpfs_type='on_disk';`);
+    // await connection.run(`PRAGMA cache_httpfs_cache_directory='./tmp';`);
+    // await connection.run(`PRAGMA cache_httpfs_cache_block_size=1048576;`);
 
     for (const sessionFile of sessionFiles) {
       try {
