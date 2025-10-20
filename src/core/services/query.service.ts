@@ -1,8 +1,48 @@
+import * as crypto from 'node:crypto';
 import { DuckDBConnection, DuckDBInstance } from '@duckdb/node-api';
 import fs from 'node:fs';
 import OpenAI from 'openai';
+import path from 'node:path';
+import { Readable } from 'node:stream';
 
 import type { SessionFile } from '../types';
+
+async function getFilenameFromUrl(url: string): Promise<string> {
+  const hash: string = crypto.createHash('md5').update(url).digest('hex');
+
+  if (fs.existsSync(path.join('tmp', `${hash}.csv`))) {
+    return path.join('tmp', `${hash}.csv`);
+  }
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error();
+  }
+
+  const readableStream =
+    response.body instanceof ReadableStream
+      ? Readable.fromWeb(response.body)
+      : response.body;
+
+  const contentType = response.headers.get('content-type');
+
+  const writeStream = fs.createWriteStream(path.join('tmp', `${hash}.tmp`));
+
+  await new Promise<void>((resolve, reject) => {
+    readableStream?.pipe(writeStream);
+    readableStream?.on('error', reject);
+    writeStream.on('finish', resolve);
+    writeStream.on('error', reject);
+  });
+
+  fs.renameSync(
+    path.join('tmp', `${hash}.tmp`),
+    path.join('tmp', `${hash}.csv`),
+  );
+
+  return path.join('tmp', `${hash}.csv`);
+}
 
 function normalizeFilename(str: string): string {
   const strSplitted = str.split('.');
@@ -25,24 +65,11 @@ export async function executePrompt(
   const connection = await DuckDBConnection.create(instance);
 
   try {
-    // const extensions = await connection.runAndReadAll(
-    //   'PRAGMA show_extensions;',
-    // );
-
-    await connection.run(`INSTALL httpfs;`);
-    // await connection.run(`INSTALL cache_httpfs FROM community;`);
-    await connection.run(`LOAD httpfs;`);
-    // await connection.run(`LOAD cache_httpfs;`);
-
-    // await connection.run(`PRAGMA cache_httpfs_type='on_disk';`);
-    // await connection.run(`PRAGMA cache_httpfs_cache_directory='./tmp';`);
-    // await connection.run(`PRAGMA cache_httpfs_cache_block_size=1048576;`);
-
     const tables = [];
 
     for (const sessionFile of sessionFiles) {
       const readerResult = await connection.runAndReadAll(
-        `SELECT * FROM read_csv_auto('${sessionFile.url}', header=true) USING SAMPLE 10 ROWS;`,
+        `SELECT * FROM read_csv_auto('${getFilenameFromUrl(sessionFile.url)}', header=true) USING SAMPLE 10 ROWS;`,
       );
 
       tables.push({
@@ -111,20 +138,11 @@ export async function executeQuery(
   const connection = await DuckDBConnection.create(instance);
 
   try {
-    await connection.run(`INSTALL httpfs;`);
-    // await connection.run(`INSTALL cache_httpfs FROM community;`);
-    await connection.run(`LOAD httpfs;`);
-    // await connection.run(`LOAD cache_httpfs;`);
-
-    // await connection.run(`PRAGMA cache_httpfs_type='on_disk';`);
-    // await connection.run(`PRAGMA cache_httpfs_cache_directory='./tmp';`);
-    // await connection.run(`PRAGMA cache_httpfs_cache_block_size=1048576;`);
-
     for (const sessionFile of sessionFiles) {
       try {
         await connection.run(`
         CREATE TEMP VIEW "${normalizeFilename(sessionFile.name)}" AS
-        SELECT * FROM read_csv_auto('${sessionFile.url}', header=true)
+        SELECT * FROM read_csv_auto('${getFilenameFromUrl(sessionFile.url)}', header=true)
       `);
       } catch {}
     }
