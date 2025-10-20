@@ -56,6 +56,7 @@ export const SESSIONS_ID_ASK_POST: RouteOptions<any, any, any, any> = {
           length: 8,
         }),
         metadata: {
+          prompt: request.body.query,
           columns: result.columns,
           count: result.rows.length,
           elapsed: result.elapsed,

@@ -11,6 +11,8 @@ export type Query = {
     count: number;
 
     elapsed: number;
+
+    prompt?: string;
   };
 
   name: string;
