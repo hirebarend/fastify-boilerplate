@@ -23,6 +23,9 @@ export async function executePrompt(
   const connection = await DuckDBConnection.create();
 
   try {
+    await connection.run(
+      `SET extension_repository = 'https://extensions.duckdb.org';`,
+    );
     await connection.run(`INSTALL httpfs;`);
     // await connection.run(`INSTALL cache_httpfs FROM community;`);
     await connection.run(`LOAD httpfs;`);
@@ -102,6 +105,9 @@ export async function executeQuery(
   const connection = await DuckDBConnection.create();
 
   try {
+    await connection.run(
+      `SET extension_repository = 'https://extensions.duckdb.org';`,
+    );
     await connection.run(`INSTALL httpfs;`);
     // await connection.run(`INSTALL cache_httpfs FROM community;`);
     await connection.run(`LOAD httpfs;`);
