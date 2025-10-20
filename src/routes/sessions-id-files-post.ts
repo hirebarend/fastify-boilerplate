@@ -25,6 +25,7 @@ export const SESSIONS_ID_FILES_POST: RouteOptions<any, any, any, any> = {
     connection.closeSync();
 
     const sessionFile: SessionFile = {
+      created: new Date().getTime(),
       id: faker.string.alphanumeric({
         casing: 'lower',
         length: 8,
@@ -37,6 +38,7 @@ export const SESSIONS_ID_FILES_POST: RouteOptions<any, any, any, any> = {
       session: {
         id: request.params.id,
       },
+      updated: new Date().getTime(),
       url: request.body.url,
     };
 

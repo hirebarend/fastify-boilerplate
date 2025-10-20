@@ -50,6 +50,7 @@ export const SESSIONS_ID_QUERY_POST: RouteOptions<any, any, any, any> = {
 
       const query: Query = {
         contentType: 'text/csv',
+        created: new Date().getTime(),
         hash: file.hash,
         id: faker.string.alphanumeric({
           casing: 'lower',
@@ -67,6 +68,7 @@ export const SESSIONS_ID_QUERY_POST: RouteOptions<any, any, any, any> = {
           id: request.params.id,
         },
         size: buffer.length,
+        updated: new Date().getTime(),
         url: file.url,
       };
 

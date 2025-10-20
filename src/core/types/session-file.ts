@@ -1,4 +1,6 @@
 export type SessionFile = {
+  created: number;
+
   id: string;
 
   metadata: {
@@ -12,6 +14,8 @@ export type SessionFile = {
   session: {
     id: string;
   };
+
+  updated: number;
 
   url: string;
 };

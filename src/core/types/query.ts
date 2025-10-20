@@ -1,6 +1,8 @@
 export type Query = {
   contentType: string;
 
+  created: number;
+
   hash: string;
 
   id: string;
@@ -24,6 +26,8 @@ export type Query = {
   };
 
   size: number;
+
+  updated: number;
 
   url: string;
 };
