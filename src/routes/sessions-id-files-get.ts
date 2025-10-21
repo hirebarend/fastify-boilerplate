@@ -15,7 +15,7 @@ export const SESSIONS_ID_FILES_GET: RouteOptions<any, any, any, any> = {
       .find(
         {
           'session.id': request.params.id,
-          updated: { gte: new Date().getTime() - 86400000 },
+          updated: { $gte: new Date().getTime() - 86400000 },
         },
         {
           projection: {
