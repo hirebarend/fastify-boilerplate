@@ -7,6 +7,7 @@ import {
 } from '../core';
 
 import type { FastifyReply, FastifyRequest, RouteOptions } from 'fastify';
+import { toCsvBuffer } from '../core/misc';
 
 export const SESSIONS_ID_QUERY_POST: RouteOptions<any, any, any, any> = {
   handler: async (
@@ -43,20 +44,7 @@ export const SESSIONS_ID_QUERY_POST: RouteOptions<any, any, any, any> = {
 
       const result = await executeQuery(request.body.query, sessionFiles);
 
-      const buffer = Buffer.from(
-        [
-          result.columns.join(','),
-          ...result.rows.map((row) =>
-            row
-              .map((column) =>
-                column?.toString().includes(',')
-                  ? `${column?.toString()}`
-                  : column?.toString(),
-              )
-              .join(','),
-          ),
-        ].join('\n'),
-      );
+      const buffer: Buffer = toCsvBuffer(result.columns, result.rows);
 
       const file = await upload(buffer, 'text/csv');
 
