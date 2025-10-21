@@ -77,7 +77,11 @@ function sanitize(buffer: Buffer): Buffer {
       header.join(','),
       ...rows.map((row) =>
         row
-          .map((column) => (column.includes(',') ? `${column}` : column))
+          .map((column) =>
+            column.includes(',') || column.includes('"')
+              ? `"${column.replace(/\"/g, '\\"')}"`
+              : column,
+          )
           .join(','),
       ),
     ].join('\n'),
