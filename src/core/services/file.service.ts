@@ -64,21 +64,45 @@ function sanitize(buffer: Buffer): Buffer {
 
   const rows = lines.slice(1);
 
-  return buffer;
+  for (let y = 0; y < rows.length; y++) {
+    for (let x = 0; x < rows[y].length; x++) {
+      if (/^€\d{1,3}(?:,\s?\d{3})*\.\d{2}$/.test(rows[y][x])) {
+        rows[y][x] = parseFloat(rows[y][x].replace(/[€, ]/g, '')).toString();
+      }
+    }
+  }
+
+  const result = Buffer.from(
+    [
+      header.join(','),
+      ...rows.map((row) =>
+        row
+          .map((column) => (column.includes(',') ? `${column}` : column))
+          .join(','),
+      ),
+    ].join('\n'),
+  );
+
+  return result;
 }
 
 export async function upload(
   buffer: Buffer,
   contentType: string,
 ): Promise<{ hash: string; url: string }> {
+  const bufferSanitized = sanitize(buffer);
+
   const s3Client = new S3Client({ region: process.env.AWS_REGION });
 
-  const hash: string = crypto.createHash('md5').update(buffer).digest('hex');
+  const hash: string = crypto
+    .createHash('md5')
+    .update(bufferSanitized)
+    .digest('hex');
 
   await s3Client.send(
     new PutObjectCommand({
       ACL: 'public-read',
-      Body: buffer,
+      Body: bufferSanitized,
       Bucket: process.env.AWS_S3_BUCKET,
       ContentType: contentType,
       Key: hash,

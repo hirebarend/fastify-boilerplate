@@ -46,7 +46,15 @@ export const SESSIONS_ID_QUERY_POST: RouteOptions<any, any, any, any> = {
       const buffer = Buffer.from(
         [
           result.columns.join(','),
-          ...result.rows.map((row) => row.join(',')),
+          ...result.rows.map((row) =>
+            row
+              .map((column) =>
+                column?.toString().includes(',')
+                  ? `${column?.toString()}`
+                  : column?.toString(),
+              )
+              .join(','),
+          ),
         ].join('\n'),
       );
 
