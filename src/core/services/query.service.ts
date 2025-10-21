@@ -81,7 +81,7 @@ export async function parsePromptToSqlQuery(
       .replace(
         '{{TABLES_AND_COLUMNS}}',
         tables
-          .map((table) => `\t${table.name}(${table.columns.join(', ')})`)
+          .map((table) => `\t${table.name}(${table.columns.map((x) => `${x} [${typeof x}]`).join(', ')})`)
           .join('\r\n'),
       )
       .replace(
