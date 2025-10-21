@@ -12,9 +12,20 @@ export const SESSIONS_ID_FILES_GET: RouteOptions<any, any, any, any> = {
 
     const sessionFiles = await container.db
       .collection<SessionFile>('session-files')
-      .find({
-        'session.id': request.params.id,
-      })
+      .find(
+        {
+          'session.id': request.params.id,
+          updated: { gte: new Date().getTime() - 86400000 },
+        },
+        {
+          projection: {
+            _id: 0,
+          },
+          sort: {
+            created: 1,
+          },
+        },
+      )
       .toArray();
 
     reply.status(200).send(sessionFiles);

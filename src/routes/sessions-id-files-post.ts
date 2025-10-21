@@ -17,10 +17,10 @@ export const SESSIONS_ID_FILES_POST: RouteOptions<any, any, any, any> = {
     const connection = await DuckDBConnection.create();
 
     const readerResult = await connection.runAndReadAll(
-      `SELECT COUNT(*) FROM read_csv_auto('${request.body.url}', header=true)`,
+      `SELECT (SELECT COUNT(*) FROM read_csv_auto('${request.body.url}', header=true)), STRING_AGG(name, ', ') FROM (PRAGMA_table_info(read_csv_auto('${request.body.url}', header=true)))`,
     );
 
-    const rows = readerResult.getRowsJson();
+    const rows = readerResult.getRowsJson()[0];
 
     connection.closeSync();
 
@@ -31,8 +31,8 @@ export const SESSIONS_ID_FILES_POST: RouteOptions<any, any, any, any> = {
         length: 8,
       }),
       metadata: {
-        columns: [], // TODO
-        count: rows[0][0] as number,
+        columns: (rows[1] as string).split(','),
+        count: rows[0] as number,
       },
       name: request.body.name,
       session: {

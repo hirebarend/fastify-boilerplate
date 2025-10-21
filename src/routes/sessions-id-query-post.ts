@@ -28,10 +28,14 @@ export const SESSIONS_ID_QUERY_POST: RouteOptions<any, any, any, any> = {
         .find(
           {
             'session.id': request.params.id,
+            updated: { gte: new Date().getTime() - 86400000 },
           },
           {
             projection: {
               _id: 0,
+            },
+            sort: {
+              created: 1,
             },
           },
         )

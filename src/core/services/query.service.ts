@@ -27,7 +27,7 @@ async function getFilenameFromUrl(url: string): Promise<string> {
 
   const contentType = response.headers.get('content-type');
 
-  const writeStream = fs.createWriteStream(path.join('tmp', `${hash}.tmp`));
+  const writeStream = fs.createWriteStream(path.join('tmp', `${hash}.csv`));
 
   await new Promise<void>((resolve, reject) => {
     readableStream?.pipe(writeStream);
@@ -35,11 +35,6 @@ async function getFilenameFromUrl(url: string): Promise<string> {
     writeStream.on('finish', resolve);
     writeStream.on('error', reject);
   });
-
-  fs.renameSync(
-    path.join('tmp', `${hash}.tmp`),
-    path.join('tmp', `${hash}.csv`),
-  );
 
   return path.join('tmp', `${hash}.csv`);
 }

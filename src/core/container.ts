@@ -1,4 +1,3 @@
-import duckdb, { DuckDBConnection } from '@duckdb/node-api';
 import { Db, MongoClient } from 'mongodb';
 
 export type Container = {
