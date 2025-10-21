@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import OpenAI from 'openai';
 import path from 'node:path';
 import { Readable } from 'node:stream';
+import { toCsvBuffer } from '../misc';
 
 import type { SessionFile } from '../types';
 
@@ -51,7 +52,7 @@ function normalizeFilename(str: string): string {
     .replace(/^-+|-+$/g, '');
 }
 
-export async function executePrompt(
+export async function parsePromptToSqlQuery(
   query: string,
   sessionFiles: Array<SessionFile>,
 ) {
@@ -75,22 +76,22 @@ export async function executePrompt(
     }
 
     const content = fs
-      .readFileSync('./prompts/sql_query.md', 'utf-8')
+      .readFileSync('./prompts/parse_prompt_to_sql_query.md', 'utf-8')
       .replace('{{USER_PROMPT}}', query)
       .replace(
         '{{TABLES_AND_COLUMNS}}',
         tables
           .map((table) => `\t${table.name}(${table.columns.join(', ')})`)
-          .join('\n'),
+          .join('\r\n'),
       )
       .replace(
         '{{ROW_SAMPLES}}',
         tables
           .map(
             (table) =>
-              `\tTABLE: ${table.name}\n${table.rows.map((row) => `\t${row.map((column) => (column?.toString().includes(',') ? `"${column}"` : column)).join(', ')}`).join('\n')}`,
+              `\tTABLE: ${table.name}\n${toCsvBuffer(table.columns, table.rows)}`,
           )
-          .join('\n'),
+          .join('\r\n\r\n'),
       );
 
     const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -112,12 +113,7 @@ export async function executePrompt(
       throw new Error('unable to parse prompt');
     }
 
-    const result = await executeQuery(str, sessionFiles);
-
-    return {
-      ...result,
-      query: str,
-    };
+    return str;
   } finally {
     connection.closeSync();
     instance.closeSync();

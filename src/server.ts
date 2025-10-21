@@ -6,7 +6,6 @@ import * as qs from 'qs';
 import { Logger } from './hooks';
 import {
   FILES_POST,
-  SESSIONS_ID_ASK_POST,
   SESSIONS_ID_FILES_GET,
   SESSIONS_ID_FILES_POST,
   SESSIONS_ID_QUERY_POST,
@@ -83,8 +82,6 @@ export async function startServer() {
   });
 
   server.route(FILES_POST);
-
-  server.route(SESSIONS_ID_ASK_POST);
 
   server.route(SESSIONS_ID_FILES_GET);
 

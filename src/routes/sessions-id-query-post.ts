@@ -1,18 +1,19 @@
 import {
   executeQuery,
   getContainer,
+  parsePromptToSqlQuery,
   Query,
   SessionFile,
+  toCsvBuffer,
   upload,
 } from '../core';
 
 import type { FastifyReply, FastifyRequest, RouteOptions } from 'fastify';
-import { toCsvBuffer } from '../core/misc';
 
 export const SESSIONS_ID_QUERY_POST: RouteOptions<any, any, any, any> = {
   handler: async (
     request: FastifyRequest<{
-      Body: { query: string };
+      Body: { prompt?: string; query?: string };
       Params: {
         id: string;
       };
@@ -42,7 +43,11 @@ export const SESSIONS_ID_QUERY_POST: RouteOptions<any, any, any, any> = {
         )
         .toArray();
 
-      const result = await executeQuery(request.body.query, sessionFiles);
+      const q = request.body.prompt
+        ? await parsePromptToSqlQuery(request.body.prompt, sessionFiles)
+        : request.body.query || '';
+
+      const result = await executeQuery(q, sessionFiles);
 
       const buffer: Buffer = toCsvBuffer(result.columns, result.rows);
 
@@ -63,7 +68,7 @@ export const SESSIONS_ID_QUERY_POST: RouteOptions<any, any, any, any> = {
           elapsed: result.elapsed,
         },
         name: '',
-        query: request.body.query,
+        query: q,
         session: {
           id: request.params.id,
         },
