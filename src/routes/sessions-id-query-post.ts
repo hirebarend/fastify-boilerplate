@@ -69,6 +69,7 @@ export const SESSIONS_ID_QUERY_POST: RouteOptions<any, any, any, any> = {
         },
         name: '',
         query: q,
+        rows: [],
         session: {
           id: request.params.id,
         },

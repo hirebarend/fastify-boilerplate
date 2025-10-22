@@ -27,6 +27,8 @@ export type Query = {
 
   size: number;
 
+  rows: Array<Array<any>>;
+
   updated: number;
 
   url: string;

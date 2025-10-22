@@ -7,13 +7,24 @@ function sanitize(buffer: Buffer): Buffer {
 
   const [header, ...rows] = data;
 
+  const normalizedHeader = header.map((x) =>
+    x
+      .split('.')[0]
+      .normalize('NFKD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '_')
+      .replace(/^-+|-+$/g, ''),
+  );
+
   const normalizedRows = rows.map((row) =>
     row.map((cell) =>
       cell.startsWith('€') ? cell.replace('€', '').replace(',', '') : cell,
     ),
   );
 
-  const result = toCsvBuffer(header, normalizedRows);
+  const result = toCsvBuffer(normalizedHeader, normalizedRows);
 
   return result;
 }
