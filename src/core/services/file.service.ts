@@ -9,7 +9,6 @@ function sanitize(buffer: Buffer): Buffer {
 
   const normalizedHeader = header.map((x) =>
     x
-      .split('.')[0]
       .normalize('NFKD')
       .replace(/[\u0300-\u036f]/g, '')
       .toLowerCase()
