@@ -7,6 +7,7 @@ import { Readable } from 'node:stream';
 import { toCsvBuffer } from '../misc';
 
 import type { SessionFile } from '../types';
+import { getContainer } from '../container';
 
 async function getFilenameFromUrl(url: string): Promise<string> {
   const hash: string = crypto.createHash('md5').update(url).digest('hex');
@@ -56,6 +57,8 @@ export async function parsePromptToSqlQuery(
   query: string,
   sessionFiles: Array<SessionFile>,
 ) {
+  const container = await getContainer();
+
   const instance = await DuckDBInstance.create(':memory:');
 
   const connection = await DuckDBConnection.create(instance);
@@ -81,7 +84,10 @@ export async function parsePromptToSqlQuery(
       .replace(
         '{{TABLES_AND_COLUMNS}}',
         tables
-          .map((table) => `\t${table.name}(${table.columns.map((x) => `${x} [${typeof x}]`).join(', ')})`)
+          .map(
+            (table) =>
+              `\t${table.name}(${table.columns.map((x) => `${x} [${typeof x}]`).join(', ')})`,
+          )
           .join('\r\n'),
       )
       .replace(
@@ -105,6 +111,10 @@ export async function parsePromptToSqlQuery(
         },
       ],
       temperature: 0,
+    });
+
+    await container.db.collection('responses').insertOne({
+      ...resp,
     });
 
     const str = resp.choices?.[0]?.message?.content;
