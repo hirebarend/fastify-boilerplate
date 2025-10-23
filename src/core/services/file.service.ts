@@ -1,21 +1,13 @@
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import * as crypto from 'node:crypto';
-import { fromCsvBuffer, toCsvBuffer } from '../misc';
+import { fromCsvBuffer, toCsvBuffer, toSlug } from '../misc';
 
 function sanitize(buffer: Buffer): Buffer {
   const data = fromCsvBuffer(buffer);
 
   const [header, ...rows] = data;
 
-  const normalizedHeader = header.map((x) =>
-    x
-      .normalize('NFKD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, '_')
-      .replace(/^-+|-+$/g, ''),
-  );
+  const normalizedHeader = header.map((x) => toSlug(x));
 
   const normalizedRows = rows.map((row) =>
     row.map((cell) =>

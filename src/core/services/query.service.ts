@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import OpenAI from 'openai';
 import path from 'node:path';
 import { Readable } from 'node:stream';
-import { toCsvBuffer } from '../misc';
+import { toCsvBuffer, toSlug } from '../misc';
 
 import type { SessionFile } from '../types';
 import { getContainer } from '../container';
@@ -44,13 +44,7 @@ async function getFilenameFromUrl(url: string): Promise<string> {
 function normalizeFilename(str: string): string {
   const strSplitted = str.split('.');
 
-  return strSplitted[0]
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, '_')
-    .replace(/^-+|-+$/g, '');
+  return toSlug(strSplitted[0]);
 }
 
 export async function parsePromptToSqlQuery(
