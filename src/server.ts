@@ -8,6 +8,7 @@ import {
   FILES_POST,
   SESSIONS_ID_FILES_GET,
   SESSIONS_ID_FILES_POST,
+  SESSIONS_ID_QUERY_GET,
   SESSIONS_ID_QUERY_POST,
 } from './routes';
 
@@ -86,6 +87,8 @@ export async function startServer() {
   server.route(SESSIONS_ID_FILES_GET);
 
   server.route(SESSIONS_ID_FILES_POST);
+
+  server.route(SESSIONS_ID_QUERY_GET);
 
   server.route(SESSIONS_ID_QUERY_POST);
 

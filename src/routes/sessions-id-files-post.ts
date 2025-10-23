@@ -1,4 +1,4 @@
-import { DuckDBConnection } from '@duckdb/node-api';
+import { DuckDBConnection, DuckDBInstance } from '@duckdb/node-api';
 import { FastifyReply, FastifyRequest, RouteOptions } from 'fastify';
 import { getContainer, SessionFile } from '../core';
 
@@ -14,25 +14,44 @@ export const SESSIONS_ID_FILES_POST: RouteOptions<any, any, any, any> = {
 
     const container = await getContainer();
 
-    const connection = await DuckDBConnection.create();
+    const instance = await DuckDBInstance.create(':memory:');
 
-    const readerResult = await connection.runAndReadAll(
+    const connection = await DuckDBConnection.create(instance);
+
+    const readerResultCount = await connection.runAndReadAll(
       `SELECT COUNT(*) FROM read_csv_auto('${request.body.url}', header=true)`,
     );
 
-    const row = readerResult.getRowsJson()[0];
+    const readerResultRows = await connection.runAndReadAll(
+      `SELECT * FROM read_csv_auto('${request.body.url}', header=true)`,
+    );
 
     connection.closeSync();
+    instance.closeSync();
+
+    await container.db.collection<SessionFile>('session-files').updateMany(
+      {
+        deleted: false,
+        name: request.body.name,
+        'session.id': request.params.id,
+      },
+      {
+        $set: {
+          deleted: true,
+        },
+      },
+    );
 
     const sessionFile: SessionFile = {
       created: new Date().getTime(),
+      deleted: false,
       id: faker.string.alphanumeric({
         casing: 'lower',
         length: 8,
       }),
       metadata: {
-        columns: [], // TODO
-        count: row[0] as number,
+        columns: readerResultRows.columnNames(),
+        count: readerResultCount.getRowsJson()[0][0] as number,
       },
       name: request.body.name,
       session: {

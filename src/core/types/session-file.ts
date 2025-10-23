@@ -1,6 +1,8 @@
 export type SessionFile = {
   created: number;
 
+  deleted: boolean;
+
   id: string;
 
   metadata: {

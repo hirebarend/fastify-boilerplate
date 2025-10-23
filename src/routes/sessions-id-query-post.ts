@@ -1,7 +1,6 @@
 import {
   executeQuery,
   getContainer,
-  parsePromptToSqlQuery,
   Query,
   SessionFile,
   toCsvBuffer,
@@ -29,8 +28,8 @@ export const SESSIONS_ID_QUERY_POST: RouteOptions<any, any, any, any> = {
         .collection<SessionFile>('session-files')
         .find(
           {
+            deleted: false,
             'session.id': request.params.id,
-            updated: { $gte: new Date().getTime() - 86400000 },
           },
           {
             projection: {
@@ -43,11 +42,7 @@ export const SESSIONS_ID_QUERY_POST: RouteOptions<any, any, any, any> = {
         )
         .toArray();
 
-      const q = request.body.prompt
-        ? await parsePromptToSqlQuery(request.body.prompt, sessionFiles)
-        : request.body.query || '';
-
-      const result = await executeQuery(q, sessionFiles);
+      const result = await executeQuery(request.body.query || '', sessionFiles);
 
       const buffer: Buffer = toCsvBuffer(result.columns, result.rows);
 
@@ -62,13 +57,12 @@ export const SESSIONS_ID_QUERY_POST: RouteOptions<any, any, any, any> = {
           length: 8,
         }),
         metadata: {
-          prompt: request.body.prompt,
           columns: result.columns,
           count: result.rows.length,
           elapsed: result.elapsed,
         },
         name: '',
-        query: q,
+        query: request.body.query || '',
         rows: [],
         session: {
           id: request.params.id,
@@ -104,12 +98,6 @@ export const SESSIONS_ID_QUERY_POST: RouteOptions<any, any, any, any> = {
   url: '/api/v1/sessions/:id/query',
   schema: {
     tags: ['sessions'],
-    // Uncomment the following lines to enforce authentication
-    // security: [
-    //   {
-    //     apiKey: [],
-    //   },
-    // ],
     body: {
       type: 'object',
       properties: {

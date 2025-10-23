@@ -14,8 +14,8 @@ export const SESSIONS_ID_FILES_GET: RouteOptions<any, any, any, any> = {
       .collection<SessionFile>('session-files')
       .find(
         {
+          deleted: false,
           'session.id': request.params.id,
-          updated: { $gte: new Date().getTime() - 86400000 },
         },
         {
           projection: {
