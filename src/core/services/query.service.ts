@@ -147,7 +147,17 @@ export async function executeQuery(
 
     const columns = readerResult.columnNames();
 
-    const rows = readerResult.getRowsJson();
+    const columnTypes = readerResult.columnTypes();
+
+    const rows = readerResult
+      .getRowsJson()
+      .map((row) =>
+        row.map((cell, index) =>
+          cell && columnTypes[index].toString() === 'BIGINT'
+            ? parseFloat(cell.toString())
+            : cell,
+        ),
+      );
 
     return {
       columns,
