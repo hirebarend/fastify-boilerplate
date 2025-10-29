@@ -14,7 +14,7 @@ import {
 
 export async function startServer() {
   const server = fastify({
-    bodyLimit: 10 * 1048576, // 10MB
+    bodyLimit: 50 * 1048576, // 50MB
     caseSensitive: false,
     ignoreDuplicateSlashes: true,
     ignoreTrailingSlash: true,
