@@ -26,7 +26,7 @@
     "@fastify/swagger": "^9.9.2",
     "@fastify/swagger-ui": "^6.1.2",
     "dotenv": "^18.0.0",
-    "fastify": "^5.12.5",
+    "fastify": "^5.12.7",
     "mongodb": "^7.7.0",
     "qs": "^6.16.0"
   }
